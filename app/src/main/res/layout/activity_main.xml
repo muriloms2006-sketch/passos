@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contador de Passos"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:padding="12dp" />
+
+            <TextView
+                android:id="@+id/txtPassos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Passos: 0"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/txtMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Meta diária: 5000 passos"
+                android:textSize="16sp" />
+
+            <com.example.contadorpassos.GraficoPassos
+                android:id="@+id/grafico"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_margin="12dp" />
+
+            <TextView
+                android:id="@+id/txtLocalizacao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Localização ainda não obtida"
+                android:padding="10dp" />
+
+            <Button
+                android:id="@+id/btnLocalizacao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Obter localização" />
+
+            <Button
+                android:id="@+id/btnSalvar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Salvar registro" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Histórico"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:padding="12dp" />
+
+            <TextView
+                android:id="@+id/txtHistorico"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nenhum registro salvo"
+                android:padding="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
