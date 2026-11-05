@@ -1,103 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- Layout principal da tela do aplicativo -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-
-    android:id="@+id/main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:fillViewport="true">
 
-    <!-- Permite rolar a tela caso o conteúdo ultrapasse o espaço disponível -->
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal">
 
-        <!-- Organiza os componentes um abaixo do outro -->
-        <LinearLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Contador de Passos"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:padding="12dp" />
+
+        <TextView
+            android:id="@+id/txtPassos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Passos: 0"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/txtMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meta diária: 5000 passos"
+            android:textSize="16sp" />
+
+        <com.app.meuspassos.GraficoPassos
+            android:id="@+id/grafico"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_margin="12dp" />
+
+        <TextView
+            android:id="@+id/txtLocalizacao"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:gravity="center_horizontal">
+            android:text="Localização ainda não obtida"
+            android:padding="10dp" />
 
-            <!-- Título principal do aplicativo -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Contador de Passos"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:padding="12dp" />
+        <Button
+            android:id="@+id/btnLocalizacao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Obter localização" />
 
-            <!-- Exibe a quantidade atual de passos registrados pelo sensor -->
-            <TextView
-                android:id="@+id/txtPassos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Passos: 0"
-                android:textSize="32sp"
-                android:textStyle="bold"
-                android:padding="8dp" />
+        <Button
+            android:id="@+id/btnSalvar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Salvar registro" />
 
-            <!-- Informa a quantidade de passos necessária para atingir a meta -->
-            <TextView
-                android:id="@+id/txtMeta"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Meta diária: 5000 passos"
-                android:textSize="16sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Histórico"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:padding="12dp" />
 
-            <!-- Gráfico personalizado que representa o progresso da meta de passos -->
-            <com.app.meuspassos.GraficoPassos
-                android:id="@+id/grafico"
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_margin="12dp" />
+        <TextView
+            android:id="@+id/txtHistorico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nenhum registro salvo"
+            android:padding="8dp" />
 
-            <!-- Exibe a latitude e a longitude obtidas pelo GPS ou pela rede -->
-            <TextView
-                android:id="@+id/txtLocalizacao"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Localização ainda não obtida"
-                android:padding="10dp" />
-
-            <!-- Botão utilizado para solicitar a localização do aparelho -->
-            <Button
-                android:id="@+id/btnLocalizacao"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Obter localização" />
-
-            <!-- Botão utilizado para salvar os passos e a localização no banco de dados -->
-            <Button
-                android:id="@+id/btnSalvar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Salvar registro" />
-
-            <!-- Título da seção que apresenta os registros anteriores -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Histórico"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:padding="12dp" />
-
-            <!-- Exibe os registros salvos no banco de dados -->
-            <TextView
-                android:id="@+id/txtHistorico"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nenhum registro salvo"
-                android:padding="8dp" />
-
-        </LinearLayout>
-    </ScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</ScrollView>
