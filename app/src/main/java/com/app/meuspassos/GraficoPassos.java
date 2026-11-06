@@ -13,19 +13,18 @@ public class GraficoPassos extends View {
     private int passos = 0;
     private final int meta = 5000;
 
-    // Construtor utilizado pelo XML
+    // Construtor obrigatório para o XML
     public GraficoPassos(Context context, AttributeSet attrs) {
         super(context, attrs);
         configurar();
     }
 
-    // Construtor utilizado pelo Java
+    // Construtor para criação pelo Java
     public GraficoPassos(Context context) {
         super(context);
         configurar();
     }
 
-    // Configura o pincel
     private void configurar() {
         pincel = new Paint(Paint.ANTI_ALIAS_FLAG);
         pincel.setAntiAlias(true);
@@ -37,7 +36,6 @@ public class GraficoPassos extends View {
         invalidate();
     }
 
-    // Desenha o gráfico
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -53,26 +51,24 @@ public class GraficoPassos extends View {
         pincel.setColor(Color.LTGRAY);
 
         canvas.drawRoundRect(
-                esquerda, topo, direita, baixo,
+                esquerda, topo,
+                direita, baixo,
                 15, 15, pincel
         );
 
-        // Calcula o progresso da meta
+        // Calcula o progresso
         float progresso = Math.min(
                 1f, passos / (float) meta
         );
 
-        // Barra verde
+        // Barra de progresso
         pincel.setColor(Color.rgb(40, 160, 90));
 
         canvas.drawRoundRect(
-                esquerda,
-                topo,
+                esquerda, topo,
                 esquerda + (direita - esquerda) * progresso,
                 baixo,
-                15,
-                15,
-                pincel
+                15, 15, pincel
         );
 
         // Texto do percentual
