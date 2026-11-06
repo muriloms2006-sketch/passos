@@ -1,0 +1,77 @@
+# Compila o aplicativo, roda os testes unitários e gera o APK automaticamente.
+#
+# - Em todo push/PR para a master: gera o APK e o disponibiliza como "artifact"
+#   na aba Actions do GitHub.
+# - Ao criar uma tag no formato v* (ex.: v1.0.0): além disso, publica uma
+#   Release no GitHub com o APK anexado para download.
+name: Android CI
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compilar APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      # O projeto (gradle/gradle-daemon-jvm.properties) exige JDK 25
+      - name: Configurar JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configurar Gradle (com cache)
+        uses: gradle/actions/setup-gradle@v5
+
+      # Garante a permissão de execução do gradlew no Linux
+      - name: Dar permissão de execução ao gradlew
+        run: chmod +x gradlew
+
+      - name: Compilar e rodar testes unitários
+        run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
+
+      - name: Renomear APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk meuspassos.apk
+
+      - name: Publicar APK como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: meuspassos-apk
+          path: meuspassos.apk
+          if-no-files-found: error
+
+  release:
+    name: Publicar Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Baixar APK gerado
+        uses: actions/download-artifact@v4
+        with:
+          name: meuspassos-apk
+
+      - name: Criar Release com o APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: meuspassos.apk
+          generate_release_notes: true
