@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class BancoDados extends SQLiteOpenHelper {
 
-    // Nome e versão do banco
     private static final String NOME_BANCO = "passos.db";
     private static final int VERSAO = 1;
 
@@ -16,7 +15,6 @@ public class BancoDados extends SQLiteOpenHelper {
         super(context, NOME_BANCO, null, VERSAO);
     }
 
-    // Cria a tabela quando o banco é criado
     @Override
     public void onCreate(SQLiteDatabase db) {
 
@@ -30,15 +28,11 @@ public class BancoDados extends SQLiteOpenHelper {
         );
     }
 
-    // Atualização da estrutura do banco
     @Override
     public void onUpgrade(
             SQLiteDatabase db, int antiga, int nova) {
-
-        // Não há migrações nesta versão.
     }
 
-    // Salva um registro
     public boolean salvar(
             int passos,
             double latitude,
@@ -63,7 +57,6 @@ public class BancoDados extends SQLiteOpenHelper {
         return resultado != -1;
     }
 
-    // Consulta os registros salvos
     public Cursor listar() {
 
         SQLiteDatabase db = getReadableDatabase();

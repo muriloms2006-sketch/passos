@@ -28,29 +28,21 @@ public class MainActivity extends Activity
     private static final int PEDIR_ATIVIDADE = 1;
     private static final int PEDIR_LOCALIZACAO = 2;
 
-    private static final int META = 5000;
-
-    // Sensor de passos
     private SensorManager gerenciador;
     private Sensor sensorPassos;
 
-    // Banco de dados
     private BancoDados banco;
 
-    // Localização
     private LocationManager localizador;
 
-    // Componentes da tela
     private TextView txtPassos;
     private TextView txtLocalizacao;
     private TextView txtHistorico;
     private GraficoPassos grafico;
 
-    // Dados dos passos
     private int passosIniciais = -1;
     private int passos = 0;
 
-    // Coordenadas
     private double latitude = 0;
     private double longitude = 0;
 
@@ -61,7 +53,6 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        // Recupera os dados após a rotação da tela
         if (savedInstanceState != null) {
             passos = savedInstanceState.getInt("passos", 0);
             passosIniciais = savedInstanceState.getInt("passosIniciais", -1);
@@ -71,11 +62,16 @@ public class MainActivity extends Activity
             temLocalizacao = savedInstanceState.getBoolean("temLocalizacao", false);
         }
 
-        // Relaciona os componentes do XML
         txtPassos = findViewById(R.id.txtPassos);
         txtLocalizacao = findViewById(R.id.txtLocalizacao);
         txtHistorico = findViewById(R.id.txtHistorico);
         grafico = findViewById(R.id.grafico);
+
+        TextView txtMeta = findViewById(R.id.txtMeta);
+        txtMeta.setText(getString(
+                R.string.meta_diaria,
+                getResources().getInteger(R.integer.meta_diaria)
+        ));
 
         Button btnLocalizacao =
                 findViewById(R.id.btnLocalizacao);
@@ -83,10 +79,8 @@ public class MainActivity extends Activity
         Button btnSalvar =
                 findViewById(R.id.btnSalvar);
 
-        // Inicializa o banco de dados
         banco = new BancoDados(this);
 
-        // Inicializa o gerenciador de sensores
         gerenciador = (SensorManager)
                 getSystemService(Context.SENSOR_SERVICE);
 
@@ -96,36 +90,29 @@ public class MainActivity extends Activity
             );
         }
 
-        // Inicializa o serviço de localização
         localizador = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
 
-        // Verifica se o aparelho possui sensor de passos
         if (sensorPassos == null) {
             Toast.makeText(
                     this,
-                    "Sensor de passos não encontrado",
+                    R.string.sensor_nao_encontrado,
                     Toast.LENGTH_LONG
             ).show();
         }
 
-        // Botão para obter localização
         btnLocalizacao.setOnClickListener(v ->
                 obterLocalizacao()
         );
 
-        // Botão para salvar registro
         btnSalvar.setOnClickListener(v ->
                 salvarRegistro()
         );
 
-        // Atualiza a tela
         atualizarTela();
 
-        // Mostra os registros salvos
         mostrarHistorico();
 
-        // Solicita permissão para contar passos
         if (android.os.Build.VERSION.SDK_INT >= 29 &&
                 checkSelfPermission(
                         Manifest.permission.ACTIVITY_RECOGNITION
@@ -140,7 +127,6 @@ public class MainActivity extends Activity
         }
     }
 
-    // Inicia o sensor de passos
     private void iniciarSensor() {
 
         if (gerenciador == null || sensorPassos == null) {
@@ -161,7 +147,6 @@ public class MainActivity extends Activity
         );
     }
 
-    // Recebe os dados do sensor
     @Override
     public void onSensorChanged(SensorEvent evento) {
 
@@ -170,12 +155,11 @@ public class MainActivity extends Activity
 
             int totalPassos = (int) evento.values[0];
 
-            // Define o valor inicial do sensor
+            // O sensor conta desde que o celular ligou, então a primeira leitura vira a base
             if (passosIniciais == -1) {
                 passosIniciais = totalPassos;
             }
 
-            // Calcula os passos desde o início da medição
             passos = Math.max(
                     0,
                     totalPassos - passosIniciais
@@ -187,14 +171,12 @@ public class MainActivity extends Activity
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int precisao) {
-        // Não é necessário tratar a precisão neste projeto.
     }
 
-    // Atualiza os textos e o gráfico
     private void atualizarTela() {
 
         if (txtPassos != null) {
-            txtPassos.setText("Passos: " + passos);
+            txtPassos.setText(getString(R.string.passos, passos));
         }
 
         if (grafico != null) {
@@ -202,7 +184,6 @@ public class MainActivity extends Activity
         }
     }
 
-    // Solicita a localização
     private void obterLocalizacao() {
 
         boolean temFina = checkSelfPermission(
@@ -229,7 +210,7 @@ public class MainActivity extends Activity
         if (localizador == null) {
             Toast.makeText(
                     this,
-                    "Serviço de localização indisponível",
+                    R.string.localizacao_indisponivel,
                     Toast.LENGTH_SHORT
             ).show();
             return;
@@ -253,13 +234,13 @@ public class MainActivity extends Activity
             } else {
                 Toast.makeText(
                         this,
-                        "Ative a localização do celular",
+                        R.string.ative_localizacao,
                         Toast.LENGTH_LONG
                 ).show();
                 return;
             }
 
-            // Tenta obter a última localização conhecida
+            // Mostra a última posição conhecida enquanto o GPS não responde
             Location ultima = localizador.getLastKnownLocation(
                     provedor
             );
@@ -267,12 +248,9 @@ public class MainActivity extends Activity
             if (ultima != null) {
                 receberLocalizacao(ultima);
             } else {
-                txtLocalizacao.setText(
-                        "Buscando localização..."
-                );
+                txtLocalizacao.setText(R.string.buscando_localizacao);
             }
 
-            // Solicita atualização da localização
             localizador.requestLocationUpdates(
                     provedor,
                     1000,
@@ -284,13 +262,12 @@ public class MainActivity extends Activity
 
             Toast.makeText(
                     this,
-                    "Não foi possível obter a localização",
+                    R.string.erro_localizacao,
                     Toast.LENGTH_LONG
             ).show();
         }
     }
 
-    // Recebe a localização atualizada
     @Override
     public void onLocationChanged(Location local) {
 
@@ -301,7 +278,6 @@ public class MainActivity extends Activity
         }
     }
 
-    // Guarda latitude e longitude
     private void receberLocalizacao(Location local) {
 
         latitude = local.getLatitude();
@@ -309,20 +285,20 @@ public class MainActivity extends Activity
 
         temLocalizacao = true;
 
-        txtLocalizacao.setText(
-                "Latitude: " + latitude +
-                        "\nLongitude: " + longitude
-        );
+        txtLocalizacao.setText(getString(
+                R.string.coordenadas,
+                String.valueOf(latitude),
+                String.valueOf(longitude)
+        ));
     }
 
-    // Salva o registro no banco
     private void salvarRegistro() {
 
         if (sensorPassos == null || passosIniciais == -1) {
 
             Toast.makeText(
                     this,
-                    "Aguardando leitura do sensor de passos",
+                    R.string.aguardando_sensor,
                     Toast.LENGTH_LONG
             ).show();
 
@@ -333,14 +309,13 @@ public class MainActivity extends Activity
 
             Toast.makeText(
                     this,
-                    "Obtenha a localização antes de salvar",
+                    R.string.obtenha_localizacao,
                     Toast.LENGTH_LONG
             ).show();
 
             return;
         }
 
-        // Obtém a data e o horário
         SimpleDateFormat formato =
                 new SimpleDateFormat(
                         "dd/MM/yyyy HH:mm",
@@ -349,7 +324,6 @@ public class MainActivity extends Activity
 
         String data = formato.format(new Date());
 
-        // Salva os dados
         boolean salvou = banco.salvar(
                 passos,
                 latitude,
@@ -361,7 +335,7 @@ public class MainActivity extends Activity
 
             Toast.makeText(
                     this,
-                    "Registro salvo com sucesso!",
+                    R.string.registro_salvo,
                     Toast.LENGTH_SHORT
             ).show();
 
@@ -371,13 +345,12 @@ public class MainActivity extends Activity
 
             Toast.makeText(
                     this,
-                    "Erro ao salvar registro",
+                    R.string.erro_salvar,
                     Toast.LENGTH_SHORT
             ).show();
         }
     }
 
-    // Consulta e mostra o histórico
     private void mostrarHistorico() {
 
         Cursor cursor = banco.listar();
@@ -395,15 +368,13 @@ public class MainActivity extends Activity
                     double lon = cursor.getDouble(2);
                     String data = cursor.getString(3);
 
-                    historico.append("Passos: ")
-                            .append(quantidade)
-                            .append("\nLatitude: ")
-                            .append(lat)
-                            .append("\nLongitude: ")
-                            .append(lon)
-                            .append("\nData: ")
-                            .append(data)
-                            .append("\n\n");
+                    historico.append(getString(
+                            R.string.item_historico,
+                            quantidade,
+                            String.valueOf(lat),
+                            String.valueOf(lon),
+                            data
+                    )).append("\n\n");
 
                 } while (cursor.moveToNext());
 
@@ -411,9 +382,7 @@ public class MainActivity extends Activity
 
             } else {
 
-                txtHistorico.setText(
-                        "Nenhum registro salvo"
-                );
+                txtHistorico.setText(R.string.historico_vazio);
             }
 
         } finally {
@@ -425,19 +394,15 @@ public class MainActivity extends Activity
     protected void onSaveInstanceState(Bundle estado) {
         super.onSaveInstanceState(estado);
 
-        // Salva a quantidade de passos
         estado.putInt("passos", passos);
 
-        // Salva a leitura inicial do sensor
         estado.putInt("passosIniciais", passosIniciais);
 
-        // Salva a localização
         estado.putDouble("latitude", latitude);
         estado.putDouble("longitude", longitude);
         estado.putBoolean("temLocalizacao", temLocalizacao);
     }
 
-    // Trata as permissões solicitadas
     @Override
     public void onRequestPermissionsResult(
             int codigo,
@@ -461,7 +426,7 @@ public class MainActivity extends Activity
 
                 Toast.makeText(
                         this,
-                        "Permissão para contar passos negada",
+                        R.string.permissao_passos_negada,
                         Toast.LENGTH_LONG
                 ).show();
             }
@@ -483,14 +448,13 @@ public class MainActivity extends Activity
 
                 Toast.makeText(
                         this,
-                        "Permissão de localização negada",
+                        R.string.permissao_localizacao_negada,
                         Toast.LENGTH_LONG
                 ).show();
             }
         }
     }
 
-    // Inicia o sensor quando a tela volta a ficar ativa
     @Override
     protected void onResume() {
         super.onResume();
@@ -504,7 +468,6 @@ public class MainActivity extends Activity
         }
     }
 
-    // Para o sensor e as atualizações ao sair da tela
     @Override
     protected void onPause() {
         super.onPause();
@@ -520,17 +483,14 @@ public class MainActivity extends Activity
 
     @Override
     public void onProviderEnabled(String provedor) {
-        // Provedor ativado.
     }
 
     @Override
     public void onProviderDisabled(String provedor) {
-        // Provedor desativado.
     }
 
     @Override
     public void onStatusChanged(
             String provedor, int status, Bundle extras) {
-        // Método mantido para compatibilidade.
     }
 }
