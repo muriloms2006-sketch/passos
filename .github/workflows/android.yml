@@ -1,0 +1,75 @@
+# Todo push/PR na master gera o APK, que fica pra baixar na aba Actions.
+# Se criar uma tag v* (tipo v1.0.0), ele também sobe o APK numa Release.
+name: Android CI
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compilar APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      # O gradle-daemon-jvm.properties pede JDK 25
+      - name: Configurar JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      # Sem listar os pacotes a action tenta instalar o "tools", que nem existe mais
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-37.0 build-tools;36.0.0'
+
+      - name: Configurar Gradle (com cache)
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Dar permissão de execução ao gradlew
+        run: chmod +x gradlew
+
+      - name: Compilar e rodar testes unitários
+        run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
+
+      - name: Renomear APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk meuspassos.apk
+
+      - name: Publicar APK como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: meuspassos-apk
+          path: meuspassos.apk
+          if-no-files-found: error
+
+  release:
+    name: Publicar Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Baixar APK gerado
+        uses: actions/download-artifact@v4
+        with:
+          name: meuspassos-apk
+
+      - name: Criar Release com o APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: meuspassos.apk
+          generate_release_notes: true
