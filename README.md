@@ -123,4 +123,5 @@ O APK é gerado em `app/build/outputs/apk/debug/app-debug.apk`.
 
 - Murilo
 - Kauã
-- _(adicionar demais integrantes)_
+- Yuri
+- Nathalia

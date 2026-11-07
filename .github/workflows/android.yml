@@ -1,9 +1,5 @@
-# Compila o aplicativo, roda os testes unitários e gera o APK automaticamente.
-#
-# - Em todo push/PR para a master: gera o APK e o disponibiliza como "artifact"
-#   na aba Actions do GitHub.
-# - Ao criar uma tag no formato v* (ex.: v1.0.0): além disso, publica uma
-#   Release no GitHub com o APK anexado para download.
+# Todo push/PR na master gera o APK, que fica pra baixar na aba Actions.
+# Se criar uma tag v* (tipo v1.0.0), ele também sobe o APK numa Release.
 name: Android CI
 
 on:
@@ -26,15 +22,14 @@ jobs:
       - name: Baixar o código
         uses: actions/checkout@v5
 
-      # O projeto (gradle/gradle-daemon-jvm.properties) exige JDK 25
+      # O gradle-daemon-jvm.properties pede JDK 25
       - name: Configurar JDK 25
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
 
-      # Os pacotes precisam ser informados: o padrão da action inclui o pacote
-      # legado "tools", que não existe mais no repositório do SDK
+      # Sem listar os pacotes a action tenta instalar o "tools", que nem existe mais
       - name: Configurar Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -43,7 +38,6 @@ jobs:
       - name: Configurar Gradle (com cache)
         uses: gradle/actions/setup-gradle@v5
 
-      # Garante a permissão de execução do gradlew no Linux
       - name: Dar permissão de execução ao gradlew
         run: chmod +x gradlew
 
