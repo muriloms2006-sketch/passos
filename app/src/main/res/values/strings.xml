@@ -24,9 +24,39 @@
     <string name="botao_obter_localizacao">Obter localização</string>
     <string name="botao_salvar">Salvar registro</string>
 
-    <string name="titulo_historico">Histórico de atividades</string>
-    <string name="historico_vazio">Nenhum registro salvo</string>
-    <string name="item_historico">Passos: %1$d\nLatitude: %2$s\nLongitude: %3$s\nData: %4$s</string>
+    <string name="botao_ver_historico">Ver histórico (%1$d)</string>
+
+    <string name="titulo_historico">Histórico</string>
+    <plurals name="resumo_historico">
+        <item quantity="one">%1$d registro · %2$s passos no total</item>
+        <item quantity="other">%1$d registros · %2$s passos no total</item>
+    </plurals>
+    <string name="dica_historico">Toque para ver no mapa · segure para selecionar</string>
+    <string name="historico_vazio">Nenhum registro salvo ainda.\nSalve um registro na tela inicial e ele aparece aqui.</string>
+    <string name="item_passos">%1$s passos</string>
+    <string name="voltar">Voltar</string>
+    <string name="botao_apagar_tudo">Apagar tudo</string>
+    <string name="botao_apagar_selecionados">Apagar (%1$d)</string>
+    <plurals name="selecionados">
+        <item quantity="one">%1$d selecionado</item>
+        <item quantity="other">%1$d selecionados</item>
+    </plurals>
+    <string name="apagar_tudo_titulo">Apagar todo o histórico?</string>
+    <plurals name="apagar_tudo_mensagem">
+        <item quantity="one">O único registro será apagado. Não dá pra desfazer.</item>
+        <item quantity="other">Todos os %1$d registros serão apagados. Não dá pra desfazer.</item>
+    </plurals>
+    <string name="apagar_selecionados_titulo">Apagar registros selecionados?</string>
+    <plurals name="apagar_selecionados_mensagem">
+        <item quantity="one">%1$d registro será apagado. Não dá pra desfazer.</item>
+        <item quantity="other">%1$d registros serão apagados. Não dá pra desfazer.</item>
+    </plurals>
+    <string name="botao_apagar">Apagar</string>
+    <plurals name="registros_apagados">
+        <item quantity="one">%1$d registro apagado</item>
+        <item quantity="other">%1$d registros apagados</item>
+    </plurals>
+    <string name="local_registro">Registro de %1$s</string>
 
     <string name="sensor_nao_encontrado">Nenhum sensor de passos ou acelerômetro encontrado</string>
     <string name="permissao_passos_negada">Permissão para contar passos negada</string>

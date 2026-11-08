@@ -37,6 +37,11 @@
 
         </activity>
 
+        <activity
+            android:name=".HistoricoActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
     </application>
 
 </manifest>

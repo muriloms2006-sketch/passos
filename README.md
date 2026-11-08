@@ -5,41 +5,71 @@
 Aplicativo Android de **contagem de passos** desenvolvido como trabalho final da
 Unidade Curricular **Desenvolvimento para Dispositivos Móveis**.
 
-O app conta os passos do usuário usando o sensor do celular, mostra o progresso
-em relação a uma meta diária em um gráfico desenhado pelo próprio grupo, obtém a
+O app conta os passos do dia usando os sensores do celular, mostra o progresso
+em relação a uma meta diária num anel desenhado pelo próprio grupo, obtém a
 localização do dispositivo e salva registros (passos + localização + data/hora)
-em um banco de dados local, exibindo o histórico na tela.
+num banco de dados local, que podem ser consultados, abertos no mapa e apagados
+numa tela de histórico.
 
 ## Funcionalidades
 
-- Contagem de passos em tempo real a partir do sensor de passos do aparelho
-- Barra de progresso customizada mostrando o percentual da meta diária (5000 passos)
+- Contagem dos passos **do dia**: a contagem continua depois de fechar o app,
+  recomeça sozinha quando vira o dia e pode ser zerada manualmente
+- Sensor de passos do aparelho, com detecção pelo **acelerômetro** quando o
+  aparelho não tem esse sensor (como no emulador)
+- Anel de progresso animado com o percentual da meta diária (5000 passos), que
+  muda de cor ao bater a meta
+- Distância (km) e calorias (kcal) estimadas
 - Obtenção da localização atual (latitude e longitude) via GPS ou rede
 - Salvamento de registros com passos, localização e data/hora
-- Histórico dos registros salvos, do mais recente para o mais antigo
+- Tela de histórico: resumo, abrir o local de um registro no mapa, selecionar
+  e apagar registros ou apagar tudo
 
 ## Requisitos do trabalho
 
 | Requisito | Como foi atendido | Onde está no código |
 |---|---|---|
-| **View customizada** | `GraficoPassos` estende `View` e desenha, via `Canvas` e `Paint`, uma barra de progresso arredondada com o percentual da meta | [`GraficoPassos.java`](app/src/main/java/com/app/meuspassos/GraficoPassos.java) |
-| **Banco de dados** | SQLite com `SQLiteOpenHelper`: tabela `registros` com inserção e listagem dos registros | [`BancoDados.java`](app/src/main/java/com/app/meuspassos/BancoDados.java) |
-| **Geolocalização** | `LocationManager` com provedor GPS (ou rede, como alternativa), tratando as permissões em tempo de execução | [`MainActivity.java`](app/src/main/java/com/app/meuspassos/MainActivity.java) (`obterLocalizacao`) |
-| **Sensores** | Sensor `TYPE_STEP_COUNTER` (contador de passos) via `SensorManager` / `SensorEventListener` | [`MainActivity.java`](app/src/main/java/com/app/meuspassos/MainActivity.java) (`iniciarSensor`, `onSensorChanged`) |
+| **View customizada** | `GraficoPassos` estende `View` e desenha com `Canvas` (`drawArc`) um anel de progresso animado (`ValueAnimator`), com atributos próprios no XML (`app:meta`, `app:corProgresso`, `app:espessura`...) | [`GraficoPassos.java`](app/src/main/java/com/app/meuspassos/GraficoPassos.java), [`attrs.xml`](app/src/main/res/values/attrs.xml) |
+| **Banco de dados** | SQLite com `SQLiteOpenHelper`: tabela `registros` com inserção, listagem, contagem e exclusão (em lote, com transação) | [`BancoDados.java`](app/src/main/java/com/app/meuspassos/BancoDados.java) |
+| **Geolocalização** | `LocationManager` com provedor GPS (ou rede, como alternativa), tratando as permissões em tempo de execução; cada registro pode ser aberto no mapa | [`MainActivity.java`](app/src/main/java/com/app/meuspassos/MainActivity.java) (`obterLocalizacao`), [`HistoricoActivity.java`](app/src/main/java/com/app/meuspassos/HistoricoActivity.java) (`abrirNoMapa`) |
+| **Sensores** | `TYPE_STEP_COUNTER` via `SensorManager` / `SensorEventListener`; sem ele, `TYPE_ACCELEROMETER` com detecção de passos própria | [`MainActivity.java`](app/src/main/java/com/app/meuspassos/MainActivity.java) (`iniciarSensor`, `onSensorChanged`), [`DetectorPassos.java`](app/src/main/java/com/app/meuspassos/DetectorPassos.java), [`ContadorDiario.java`](app/src/main/java/com/app/meuspassos/ContadorDiario.java) |
 | **Compilação automática** | GitHub Actions compila o projeto, roda os testes e gera o APK a cada push/PR | [`.github/workflows/android.yml`](.github/workflows/android.yml) |
 
 ## Estrutura do projeto
 
 ```
 app/src/main/
-├── AndroidManifest.xml            # Permissões e declaração da Activity
+├── AndroidManifest.xml            # Permissões e declaração das telas
 ├── java/com/app/meuspassos/
-│   ├── MainActivity.java          # Tela principal: sensor, localização, botões e histórico
-│   ├── GraficoPassos.java         # View customizada (barra de progresso da meta)
-│   └── BancoDados.java            # Acesso ao SQLite (tabela "registros")
-└── res/layout/
-    └── activity_main.xml          # Layout da tela principal
+│   ├── MainActivity.java          # Tela inicial: sensores, localização e salvar registro
+│   ├── HistoricoActivity.java     # Tela de histórico: mapa, seleção e exclusão
+│   ├── RegistroAdapter.java       # Adapter da lista do histórico
+│   ├── GraficoPassos.java         # View customizada (anel de progresso da meta)
+│   ├── ContadorDiario.java        # Converte o total do sensor nos passos do dia
+│   ├── DetectorPassos.java        # Detecta passos pelo acelerômetro
+│   ├── Estimativas.java           # Distância, calorias e progresso
+│   ├── BancoDados.java            # Acesso ao SQLite (tabela "registros")
+│   ├── Registro.java              # Modelo de um registro salvo
+│   └── Telas.java                 # Ajuste das telas às barras do sistema
+└── res/
+    ├── layout/                    # activity_main, activity_historico, item_registro
+    ├── values/attrs.xml           # Atributos XML da view customizada
+    └── values/                    # Textos, cores, estilos e meta diária
+
+app/src/test/                      # Testes unitários (contador, detector, estimativas)
 ```
+
+### Como os passos do dia são contados
+
+O `TYPE_STEP_COUNTER` devolve o total de passos **desde que o celular ligou**. O
+`ContadorDiario` guarda uma *base* (salva em `SharedPreferences`) e calcula
+`passos do dia = total - base`. A base é trocada quando vira o dia, quando o
+usuário zera o contador e quando o celular reinicia (o total volta a zero), sem
+perder o que já tinha sido contado.
+
+Sem esse sensor, o `DetectorPassos` lê o acelerômetro: cada pisada faz a
+aceleração passar de um limiar e depois voltar (histerese), com um intervalo
+mínimo entre passos. Nesse modo os passos só são contados com o app aberto.
 
 ### Banco de dados
 
@@ -64,12 +94,18 @@ Arquivo `passos.db`, tabela `registros`:
 ## Como usar
 
 1. Abra o app e permita o acesso à **atividade física** para que os passos sejam contados.
-2. Caminhe com o celular: o contador e a barra de progresso são atualizados automaticamente.
+2. Caminhe com o celular: o anel, a distância e as calorias são atualizados automaticamente.
 3. Toque em **Obter localização** e permita o acesso à localização.
-4. Toque em **Salvar registro** para gravar os passos e a localização atuais no histórico.
+4. Toque em **Salvar registro** para gravar os passos e a localização atuais.
+5. Toque em **Ver histórico** para ver os registros:
+   - toque num registro para abrir o local no mapa;
+   - segure um registro para entrar no modo de seleção e apagar os escolhidos;
+   - use **Apagar tudo** para limpar o histórico.
 
-> **Observação:** o sensor de passos (`TYPE_STEP_COUNTER`) não existe na maioria
-> dos emuladores. Para testar a contagem de passos, use um celular físico.
+> **Observação:** a maioria dos emuladores não tem o sensor de passos
+> (`TYPE_STEP_COUNTER`), então o app usa o acelerômetro. Para simular passos no
+> emulador, mexa o aparelho em *Extended controls → Virtual sensors*. Para a
+> contagem mais precisa, use um celular físico.
 
 ## Download do APK
 
@@ -115,8 +151,9 @@ O APK é gerado em `app/build/outputs/apk/debug/app-debug.apk`.
 
 - Java 11 (código-fonte) e Android SDK (minSdk 24, targetSdk 37)
 - Gradle 9.6 com Android Gradle Plugin 9.4
-- SQLite (`SQLiteOpenHelper`)
+- SQLite (`SQLiteOpenHelper`) e `SharedPreferences`
 - `SensorManager` e `LocationManager` do Android
+- JUnit 4 para os testes unitários
 - GitHub Actions
 
 ## Integrantes
