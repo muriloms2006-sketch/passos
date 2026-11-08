@@ -4,7 +4,13 @@
     <string name="titulo">MEUS PASSOS</string>
     <string name="subtitulo">Cada passo conta!</string>
     <string name="rotulo_passos_hoje">SEUS PASSOS DE HOJE</string>
-    <string name="passos">Passos: %1$d</string>
+    <string name="estatisticas">%1$s km · %2$d kcal</string>
+    <string name="fonte_sensor_passos">Contando pelo sensor de passos</string>
+    <string name="fonte_acelerometro">Contando pelo acelerômetro (mantenha o app aberto)</string>
+    <string name="botao_zerar">Zerar contador</string>
+    <string name="zerar_titulo">Zerar contador?</string>
+    <string name="zerar_mensagem">Os passos de hoje voltam para zero. Os registros salvos não são apagados.</string>
+    <string name="cancelar">Cancelar</string>
     <string name="meta_diaria">Meta diária: %1$d passos</string>
     <string name="percentual_meta">%1$d%% da meta</string>
 
@@ -21,8 +27,7 @@
     <string name="historico_vazio">Nenhum registro salvo</string>
     <string name="item_historico">Passos: %1$d\nLatitude: %2$s\nLongitude: %3$s\nData: %4$s</string>
 
-    <string name="sensor_nao_encontrado">Sensor de passos não encontrado</string>
-    <string name="aguardando_sensor">Aguardando leitura do sensor de passos</string>
+    <string name="sensor_nao_encontrado">Nenhum sensor de passos ou acelerômetro encontrado</string>
     <string name="permissao_passos_negada">Permissão para contar passos negada</string>
     <string name="localizacao_indisponivel">Serviço de localização indisponível</string>
     <string name="ative_localizacao">Ative a localização do celular</string>

@@ -2,7 +2,9 @@ package com.app.meuspassos;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import android.database.Cursor;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -30,18 +33,21 @@ public class MainActivity extends Activity
 
     private SensorManager gerenciador;
     private Sensor sensorPassos;
+    private Sensor acelerometro;
+
+    private ContadorDiario contador;
+    private final DetectorPassos detector = new DetectorPassos();
+    private SharedPreferences preferencias;
 
     private BancoDados banco;
 
     private LocationManager localizador;
 
     private TextView txtPassos;
+    private TextView txtEstatisticas;
     private TextView txtLocalizacao;
     private TextView txtHistorico;
     private GraficoPassos grafico;
-
-    private int passosIniciais = -1;
-    private int passos = 0;
 
     private double latitude = 0;
     private double longitude = 0;
@@ -54,15 +60,13 @@ public class MainActivity extends Activity
 
         setContentView(R.layout.activity_main);
         if (savedInstanceState != null) {
-            passos = savedInstanceState.getInt("passos", 0);
-            passosIniciais = savedInstanceState.getInt("passosIniciais", -1);
-
             latitude = savedInstanceState.getDouble("latitude", 0);
             longitude = savedInstanceState.getDouble("longitude", 0);
             temLocalizacao = savedInstanceState.getBoolean("temLocalizacao", false);
         }
 
         txtPassos = findViewById(R.id.txtPassos);
+        txtEstatisticas = findViewById(R.id.txtEstatisticas);
         txtLocalizacao = findViewById(R.id.txtLocalizacao);
         txtHistorico = findViewById(R.id.txtHistorico);
         grafico = findViewById(R.id.grafico);
@@ -79,7 +83,17 @@ public class MainActivity extends Activity
         Button btnSalvar =
                 findViewById(R.id.btnSalvar);
 
+        Button btnZerar =
+                findViewById(R.id.btnZerar);
+
         banco = new BancoDados(this);
+
+        preferencias = getSharedPreferences("contador", MODE_PRIVATE);
+        contador = new ContadorDiario(
+                preferencias.getString("dia", null),
+                preferencias.getInt("base", 0),
+                preferencias.getInt("ultimoTotal", -1)
+        );
 
         gerenciador = (SensorManager)
                 getSystemService(Context.SENSOR_SERVICE);
@@ -88,17 +102,25 @@ public class MainActivity extends Activity
             sensorPassos = gerenciador.getDefaultSensor(
                     Sensor.TYPE_STEP_COUNTER
             );
+
+            if (sensorPassos == null) {
+                acelerometro = gerenciador.getDefaultSensor(
+                        Sensor.TYPE_ACCELEROMETER
+                );
+            }
         }
 
         localizador = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
 
-        if (sensorPassos == null) {
-            Toast.makeText(
-                    this,
-                    R.string.sensor_nao_encontrado,
-                    Toast.LENGTH_LONG
-            ).show();
+        TextView txtFonteSensor = findViewById(R.id.txtFonteSensor);
+
+        if (sensorPassos != null) {
+            txtFonteSensor.setText(R.string.fonte_sensor_passos);
+        } else if (acelerometro != null) {
+            txtFonteSensor.setText(R.string.fonte_acelerometro);
+        } else {
+            txtFonteSensor.setText(R.string.sensor_nao_encontrado);
         }
 
         btnLocalizacao.setOnClickListener(v ->
@@ -109,11 +131,16 @@ public class MainActivity extends Activity
                 salvarRegistro()
         );
 
+        btnZerar.setOnClickListener(v ->
+                confirmarZerar()
+        );
+
         atualizarTela();
 
         mostrarHistorico();
 
-        if (android.os.Build.VERSION.SDK_INT >= 29 &&
+        if (sensorPassos != null &&
+                android.os.Build.VERSION.SDK_INT >= 29 &&
                 checkSelfPermission(
                         Manifest.permission.ACTIVITY_RECOGNITION
                 ) != PackageManager.PERMISSION_GRANTED) {
@@ -129,7 +156,18 @@ public class MainActivity extends Activity
 
     private void iniciarSensor() {
 
-        if (gerenciador == null || sensorPassos == null) {
+        if (gerenciador == null) {
+            return;
+        }
+
+        if (sensorPassos == null) {
+            if (acelerometro != null) {
+                gerenciador.registerListener(
+                        this,
+                        acelerometro,
+                        SensorManager.SENSOR_DELAY_GAME
+                );
+            }
             return;
         }
 
@@ -153,19 +191,23 @@ public class MainActivity extends Activity
         if (evento.sensor.getType() ==
                 Sensor.TYPE_STEP_COUNTER) {
 
-            int totalPassos = (int) evento.values[0];
+            contador.registrarTotal((int) evento.values[0], hoje());
+            atualizarTela();
 
-            // O sensor conta desde que o celular ligou, então a primeira leitura vira a base
-            if (passosIniciais == -1) {
-                passosIniciais = totalPassos;
-            }
+        } else if (evento.sensor.getType() ==
+                Sensor.TYPE_ACCELEROMETER) {
 
-            passos = Math.max(
-                    0,
-                    totalPassos - passosIniciais
+            boolean deuPasso = detector.processar(
+                    evento.values[0],
+                    evento.values[1],
+                    evento.values[2],
+                    evento.timestamp
             );
 
-            atualizarTela();
+            if (deuPasso) {
+                contador.somarPasso(hoje());
+                atualizarTela();
+            }
         }
     }
 
@@ -175,13 +217,50 @@ public class MainActivity extends Activity
 
     private void atualizarTela() {
 
-        if (txtPassos != null) {
-            txtPassos.setText(getString(R.string.passos, passos));
-        }
+        int passos = contador.getPassos(hoje());
 
-        if (grafico != null) {
-            grafico.atualizar(passos);
-        }
+        txtPassos.setText(
+                NumberFormat.getIntegerInstance().format(passos)
+        );
+
+        txtEstatisticas.setText(getString(
+                R.string.estatisticas,
+                String.format(Locale.getDefault(), "%.2f", Estimativas.distanciaKm(passos)),
+                Estimativas.calorias(passos)
+        ));
+
+        grafico.atualizar(passos);
+    }
+
+    private void confirmarZerar() {
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.zerar_titulo)
+                .setMessage(R.string.zerar_mensagem)
+                .setPositiveButton(R.string.botao_zerar, (dialogo, botao) -> {
+                    contador.zerar(hoje());
+                    salvarContador();
+                    atualizarTela();
+                })
+                .setNegativeButton(R.string.cancelar, null)
+                .show();
+    }
+
+    private void salvarContador() {
+
+        preferencias.edit()
+                .putString("dia", contador.getDia())
+                .putInt("base", contador.getBase())
+                .putInt("ultimoTotal", contador.getUltimoTotal())
+                .apply();
+    }
+
+    private String hoje() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+    }
+
+    private String formatarCoordenada(double valor) {
+        return String.format(Locale.getDefault(), "%.5f", valor);
     }
 
     private void obterLocalizacao() {
@@ -287,18 +366,18 @@ public class MainActivity extends Activity
 
         txtLocalizacao.setText(getString(
                 R.string.coordenadas,
-                String.valueOf(latitude),
-                String.valueOf(longitude)
+                formatarCoordenada(latitude),
+                formatarCoordenada(longitude)
         ));
     }
 
     private void salvarRegistro() {
 
-        if (sensorPassos == null || passosIniciais == -1) {
+        if (sensorPassos == null && acelerometro == null) {
 
             Toast.makeText(
                     this,
-                    R.string.aguardando_sensor,
+                    R.string.sensor_nao_encontrado,
                     Toast.LENGTH_LONG
             ).show();
 
@@ -325,7 +404,7 @@ public class MainActivity extends Activity
         String data = formato.format(new Date());
 
         boolean salvou = banco.salvar(
-                passos,
+                contador.getPassos(hoje()),
                 latitude,
                 longitude,
                 data
@@ -371,8 +450,8 @@ public class MainActivity extends Activity
                     historico.append(getString(
                             R.string.item_historico,
                             quantidade,
-                            String.valueOf(lat),
-                            String.valueOf(lon),
+                            formatarCoordenada(lat),
+                            formatarCoordenada(lon),
                             data
                     )).append("\n\n");
 
@@ -393,10 +472,6 @@ public class MainActivity extends Activity
     @Override
     protected void onSaveInstanceState(Bundle estado) {
         super.onSaveInstanceState(estado);
-
-        estado.putInt("passos", passos);
-
-        estado.putInt("passosIniciais", passosIniciais);
 
         estado.putDouble("latitude", latitude);
         estado.putDouble("longitude", longitude);
@@ -459,6 +534,8 @@ public class MainActivity extends Activity
     protected void onResume() {
         super.onResume();
 
+        atualizarTela();
+
         if (android.os.Build.VERSION.SDK_INT < 29 ||
                 checkSelfPermission(
                         Manifest.permission.ACTIVITY_RECOGNITION
@@ -471,6 +548,8 @@ public class MainActivity extends Activity
     @Override
     protected void onPause() {
         super.onPause();
+
+        salvarContador();
 
         if (gerenciador != null) {
             gerenciador.unregisterListener(this);
