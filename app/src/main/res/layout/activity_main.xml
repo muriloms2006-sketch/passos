@@ -54,7 +54,7 @@
                 android:id="@+id/txtPassos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Passos: 0"
+                tools:text="1.234"
                 android:textSize="38sp"
                 android:textStyle="bold"
                 android:textColor="@color/texto"
@@ -69,11 +69,38 @@
                 android:textSize="15sp"
                 android:textColor="@color/texto_secundario" />
 
+            <TextView
+                android:id="@+id/txtEstatisticas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="0,96 km · 49 kcal"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/texto"
+                android:paddingTop="6dp" />
+
             <com.app.meuspassos.GraficoPassos
                 android:id="@+id/grafico"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_marginTop="15dp" />
+
+            <TextView
+                android:id="@+id/txtFonteSensor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="@string/fonte_sensor_passos"
+                android:textSize="12sp"
+                android:textColor="@color/texto_secundario" />
+
+            <Button
+                android:id="@+id/btnZerar"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/botao_zerar"
+                android:textColor="@color/primaria"
+                android:textAllCaps="false" />
 
         </LinearLayout>
 
