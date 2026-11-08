@@ -95,11 +95,14 @@
 
             <Button
                 android:id="@+id/btnZerar"
-                style="?android:attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/botao_zerar"
-                android:textColor="@color/primaria"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/texto"
+                android:backgroundTint="@color/primaria_clara"
                 android:textAllCaps="false" />
 
         </LinearLayout>
