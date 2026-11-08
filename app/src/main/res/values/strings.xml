@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">Meus Passos</string>
 
-    <string name="titulo">MEUS PASSOS</string>
-    <string name="subtitulo">Cada passo conta!</string>
-    <string name="rotulo_passos_hoje">SEUS PASSOS DE HOJE</string>
-    <string name="estatisticas">%1$s km · %2$d kcal</string>
+    <string name="subtitulo">%1$s · Cada passo conta!</string>
+    <string name="rotulo_passos_hoje">PASSOS DE HOJE</string>
+    <string name="rotulo_distancia">DISTÂNCIA</string>
+    <string name="rotulo_calorias">CALORIAS</string>
+    <string name="distancia">%1$s km</string>
+    <string name="calorias">%1$d kcal</string>
     <string name="fonte_sensor_passos">Contando pelo sensor de passos</string>
     <string name="fonte_acelerometro">Contando pelo acelerômetro (mantenha o app aberto)</string>
     <string name="botao_zerar">Zerar contador</string>
@@ -14,7 +16,6 @@
     <string name="meta_diaria">Meta diária: %1$d passos</string>
     <string name="percentual_meta">%1$d%% da meta</string>
 
-    <string name="titulo_localizacao">Localização</string>
     <string name="rotulo_posicao_atual">SUA POSIÇÃO ATUAL</string>
     <string name="localizacao_nao_obtida">Localização ainda não obtida</string>
     <string name="buscando_localizacao">Buscando localização…</string>
