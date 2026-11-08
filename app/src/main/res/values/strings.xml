@@ -1,3 +1,34 @@
 <resources>
-    <string name="app_name">meuspassos</string>
+    <string name="app_name">Meus Passos</string>
+
+    <string name="titulo">MEUS PASSOS</string>
+    <string name="subtitulo">Cada passo conta!</string>
+    <string name="rotulo_passos_hoje">SEUS PASSOS DE HOJE</string>
+    <string name="passos">Passos: %1$d</string>
+    <string name="meta_diaria">Meta diária: %1$d passos</string>
+    <string name="percentual_meta">%1$d%% da meta</string>
+
+    <string name="titulo_localizacao">Localização</string>
+    <string name="rotulo_posicao_atual">SUA POSIÇÃO ATUAL</string>
+    <string name="localizacao_nao_obtida">Localização ainda não obtida</string>
+    <string name="buscando_localizacao">Buscando localização…</string>
+    <string name="coordenadas">Latitude: %1$s\nLongitude: %2$s</string>
+
+    <string name="botao_obter_localizacao">Obter localização</string>
+    <string name="botao_salvar">Salvar registro</string>
+
+    <string name="titulo_historico">Histórico de atividades</string>
+    <string name="historico_vazio">Nenhum registro salvo</string>
+    <string name="item_historico">Passos: %1$d\nLatitude: %2$s\nLongitude: %3$s\nData: %4$s</string>
+
+    <string name="sensor_nao_encontrado">Sensor de passos não encontrado</string>
+    <string name="aguardando_sensor">Aguardando leitura do sensor de passos</string>
+    <string name="permissao_passos_negada">Permissão para contar passos negada</string>
+    <string name="localizacao_indisponivel">Serviço de localização indisponível</string>
+    <string name="ative_localizacao">Ative a localização do celular</string>
+    <string name="erro_localizacao">Não foi possível obter a localização</string>
+    <string name="permissao_localizacao_negada">Permissão de localização negada</string>
+    <string name="obtenha_localizacao">Obtenha a localização antes de salvar</string>
+    <string name="registro_salvo">Registro salvo com sucesso!</string>
+    <string name="erro_salvar">Erro ao salvar registro</string>
 </resources>

@@ -4,22 +4,19 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Color;
 import android.view.View;
 
 public class GraficoPassos extends View {
 
     private Paint pincel;
     private int passos = 0;
-    private final int meta = 5000;
+    private int meta;
 
-    // Construtor obrigatório para o XML
     public GraficoPassos(Context context, AttributeSet attrs) {
         super(context, attrs);
         configurar();
     }
 
-    // Construtor para criação pelo Java
     public GraficoPassos(Context context) {
         super(context);
         configurar();
@@ -27,10 +24,9 @@ public class GraficoPassos extends View {
 
     private void configurar() {
         pincel = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pincel.setAntiAlias(true);
+        meta = getResources().getInteger(R.integer.meta_diaria);
     }
 
-    // Atualiza a quantidade de passos
     public void atualizar(int quantidade) {
         passos = Math.max(0, quantidade);
         invalidate();
@@ -47,8 +43,7 @@ public class GraficoPassos extends View {
         float topo = getHeight() / 2f - 15;
         float baixo = topo + 30;
 
-        // Barra de fundo
-        pincel.setColor(Color.LTGRAY);
+        pincel.setColor(getContext().getColor(R.color.progresso_fundo));
 
         canvas.drawRoundRect(
                 esquerda, topo,
@@ -56,13 +51,11 @@ public class GraficoPassos extends View {
                 15, 15, pincel
         );
 
-        // Calcula o progresso
         float progresso = Math.min(
                 1f, passos / (float) meta
         );
 
-        // Barra de progresso
-        pincel.setColor(Color.rgb(40, 160, 90));
+        pincel.setColor(getContext().getColor(R.color.progresso));
 
         canvas.drawRoundRect(
                 esquerda, topo,
@@ -71,13 +64,12 @@ public class GraficoPassos extends View {
                 15, 15, pincel
         );
 
-        // Texto do percentual
-        pincel.setColor(Color.BLACK);
+        pincel.setColor(getContext().getColor(R.color.texto));
         pincel.setTextSize(32);
         pincel.setTextAlign(Paint.Align.CENTER);
 
         canvas.drawText(
-                (int) (progresso * 100) + "% da meta",
+                getContext().getString(R.string.percentual_meta, (int) (progresso * 100)),
                 getWidth() / 2f,
                 topo - 20,
                 pincel
