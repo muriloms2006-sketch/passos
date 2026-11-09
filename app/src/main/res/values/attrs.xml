@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GraficoPassos">
+        <attr name="meta" format="integer" />
+        <attr name="espessura" format="dimension" />
+        <attr name="corProgresso" format="color" />
+        <attr name="corTrilha" format="color" />
+        <attr name="corMetaAtingida" format="color" />
+        <attr name="corTexto" format="color" />
+    </declare-styleable>
+</resources>

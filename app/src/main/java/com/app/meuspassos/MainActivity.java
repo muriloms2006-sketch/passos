@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import android.database.Cursor;
 
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -43,8 +42,8 @@ public class MainActivity extends Activity
 
     private LocationManager localizador;
 
-    private TextView txtPassos;
-    private TextView txtEstatisticas;
+    private TextView txtDistancia;
+    private TextView txtCalorias;
     private TextView txtLocalizacao;
     private TextView txtHistorico;
     private GraficoPassos grafico;
@@ -59,22 +58,27 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        Telas.respeitarBarrasDoSistema(findViewById(R.id.raiz));
+
         if (savedInstanceState != null) {
             latitude = savedInstanceState.getDouble("latitude", 0);
             longitude = savedInstanceState.getDouble("longitude", 0);
             temLocalizacao = savedInstanceState.getBoolean("temLocalizacao", false);
         }
 
-        txtPassos = findViewById(R.id.txtPassos);
-        txtEstatisticas = findViewById(R.id.txtEstatisticas);
+        txtDistancia = findViewById(R.id.txtDistancia);
+        txtCalorias = findViewById(R.id.txtCalorias);
         txtLocalizacao = findViewById(R.id.txtLocalizacao);
         txtHistorico = findViewById(R.id.txtHistorico);
         grafico = findViewById(R.id.grafico);
 
         TextView txtMeta = findViewById(R.id.txtMeta);
-        txtMeta.setText(getString(
-                R.string.meta_diaria,
-                getResources().getInteger(R.integer.meta_diaria)
+        txtMeta.setText(getString(R.string.meta_diaria, grafico.getMeta()));
+
+        TextView txtData = findViewById(R.id.txtData);
+        txtData.setText(getString(
+                R.string.subtitulo,
+                new SimpleDateFormat("EEEE, d 'de' MMMM", Locale.getDefault()).format(new Date())
         ));
 
         Button btnLocalizacao =
@@ -219,13 +223,13 @@ public class MainActivity extends Activity
 
         int passos = contador.getPassos(hoje());
 
-        txtPassos.setText(
-                NumberFormat.getIntegerInstance().format(passos)
-        );
+        txtDistancia.setText(getString(
+                R.string.distancia,
+                String.format(Locale.getDefault(), "%.2f", Estimativas.distanciaKm(passos))
+        ));
 
-        txtEstatisticas.setText(getString(
-                R.string.estatisticas,
-                String.format(Locale.getDefault(), "%.2f", Estimativas.distanciaKm(passos)),
+        txtCalorias.setText(getString(
+                R.string.calorias,
                 Estimativas.calorias(passos)
         ));
 
