@@ -158,7 +158,7 @@ O APK é gerado em `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Integrantes
 
-- Murilo
-- Kauã
-- Yuri
-- Gabrielle
+- Murilo Moreira de Souza
+- Kauã Reis Rodrigues
+- Yuri de Sousa Araujo
+- Gabrielle Duarte Rodrigues
