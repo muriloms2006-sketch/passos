@@ -8,5 +8,6 @@
     <color name="texto_secundario">#93869F</color>
     <color name="rotulo">#9685A8</color>
     <color name="sucesso">#3FA26B</color>
+    <color name="perigo">#C2476B</color>
     <color name="branco">#FFFFFF</color>
 </resources>

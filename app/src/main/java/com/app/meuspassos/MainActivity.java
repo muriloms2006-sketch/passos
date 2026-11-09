@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -17,8 +18,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import android.database.Cursor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,7 +44,7 @@ public class MainActivity extends Activity
     private TextView txtDistancia;
     private TextView txtCalorias;
     private TextView txtLocalizacao;
-    private TextView txtHistorico;
+    private Button btnHistorico;
     private GraficoPassos grafico;
 
     private double latitude = 0;
@@ -69,7 +68,7 @@ public class MainActivity extends Activity
         txtDistancia = findViewById(R.id.txtDistancia);
         txtCalorias = findViewById(R.id.txtCalorias);
         txtLocalizacao = findViewById(R.id.txtLocalizacao);
-        txtHistorico = findViewById(R.id.txtHistorico);
+        btnHistorico = findViewById(R.id.btnHistorico);
         grafico = findViewById(R.id.grafico);
 
         TextView txtMeta = findViewById(R.id.txtMeta);
@@ -139,9 +138,11 @@ public class MainActivity extends Activity
                 confirmarZerar()
         );
 
-        atualizarTela();
+        btnHistorico.setOnClickListener(v ->
+                startActivity(new Intent(this, HistoricoActivity.class))
+        );
 
-        mostrarHistorico();
+        atualizarTela();
 
         if (sensorPassos != null &&
                 android.os.Build.VERSION.SDK_INT >= 29 &&
@@ -422,7 +423,7 @@ public class MainActivity extends Activity
                     Toast.LENGTH_SHORT
             ).show();
 
-            mostrarHistorico();
+            atualizarBotaoHistorico();
 
         } else {
 
@@ -434,43 +435,12 @@ public class MainActivity extends Activity
         }
     }
 
-    private void mostrarHistorico() {
+    private void atualizarBotaoHistorico() {
 
-        Cursor cursor = banco.listar();
-
-        StringBuilder historico = new StringBuilder();
-
-        try {
-
-            if (cursor.moveToFirst()) {
-
-                do {
-
-                    int quantidade = cursor.getInt(0);
-                    double lat = cursor.getDouble(1);
-                    double lon = cursor.getDouble(2);
-                    String data = cursor.getString(3);
-
-                    historico.append(getString(
-                            R.string.item_historico,
-                            quantidade,
-                            formatarCoordenada(lat),
-                            formatarCoordenada(lon),
-                            data
-                    )).append("\n\n");
-
-                } while (cursor.moveToNext());
-
-                txtHistorico.setText(historico.toString());
-
-            } else {
-
-                txtHistorico.setText(R.string.historico_vazio);
-            }
-
-        } finally {
-            cursor.close();
-        }
+        btnHistorico.setText(getString(
+                R.string.botao_ver_historico,
+                banco.contar()
+        ));
     }
 
     @Override
@@ -539,6 +509,7 @@ public class MainActivity extends Activity
         super.onResume();
 
         atualizarTela();
+        atualizarBotaoHistorico();
 
         if (android.os.Build.VERSION.SDK_INT < 29 ||
                 checkSelfPermission(

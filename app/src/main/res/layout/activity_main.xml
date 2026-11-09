@@ -203,21 +203,11 @@
             android:layout_marginTop="16dp"
             android:text="@string/botao_salvar" />
 
-        <TextView
-            style="@style/TituloSecao"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:layout_marginBottom="12dp"
-            android:text="@string/titulo_historico" />
-
-        <TextView
-            android:id="@+id/txtHistorico"
-            style="@style/Card"
-            android:text="@string/historico_vazio"
-            android:textSize="14sp"
-            android:textColor="@color/texto"
-            android:lineSpacingExtra="6dp" />
+        <Button
+            android:id="@+id/btnHistorico"
+            style="@style/Botao.Secundario"
+            android:layout_marginTop="10dp"
+            tools:text="Ver histórico (3)" />
 
     </LinearLayout>
 
