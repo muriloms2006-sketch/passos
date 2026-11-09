@@ -33,7 +33,7 @@ numa tela de histórico.
 | **Banco de dados** | SQLite com `SQLiteOpenHelper`: tabela `registros` com inserção, listagem, contagem e exclusão (em lote, com transação) | [`BancoDados.java`](app/src/main/java/com/app/meuspassos/BancoDados.java) |
 | **Geolocalização** | `LocationManager` com provedor GPS (ou rede, como alternativa), tratando as permissões em tempo de execução; cada registro pode ser aberto no mapa | [`MainActivity.java`](app/src/main/java/com/app/meuspassos/MainActivity.java) (`obterLocalizacao`), [`HistoricoActivity.java`](app/src/main/java/com/app/meuspassos/HistoricoActivity.java) (`abrirNoMapa`) |
 | **Sensores** | `TYPE_STEP_COUNTER` via `SensorManager` / `SensorEventListener`; sem ele, `TYPE_ACCELEROMETER` com detecção de passos própria | [`MainActivity.java`](app/src/main/java/com/app/meuspassos/MainActivity.java) (`iniciarSensor`, `onSensorChanged`), [`DetectorPassos.java`](app/src/main/java/com/app/meuspassos/DetectorPassos.java), [`ContadorDiario.java`](app/src/main/java/com/app/meuspassos/ContadorDiario.java) |
-| **Compilação automática** | GitHub Actions compila o projeto, roda os testes e gera o APK a cada push/PR | [`.github/workflows/android.yml`](.github/workflows/android.yml) |
+| **Compilação automática** | GitHub Actions compila o projeto, roda os testes e o lint e gera o APK a cada push/PR | [`.github/workflows/android.yml`](.github/workflows/android.yml) |
 
 ## Estrutura do projeto
 
@@ -124,7 +124,7 @@ O workflow [`android.yml`](.github/workflows/android.yml) roda automaticamente:
 
 | Evento | O que acontece |
 |---|---|
-| Push ou Pull Request para `master` | Compila o app, roda os testes unitários e publica o APK como artifact |
+| Push ou Pull Request para `master` | Compila o app, roda os testes unitários e o lint (que barra erros de layout e código) e publica o APK como artifact |
 | Push de uma tag `v*` (ex.: `v1.0.0`) | Faz o mesmo e cria uma **Release** com o APK anexado |
 | Manual (*Run workflow*) | Pode ser disparado pela aba Actions a qualquer momento |
 

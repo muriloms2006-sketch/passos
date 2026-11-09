@@ -41,8 +41,16 @@ jobs:
       - name: Dar permissão de execução ao gradlew
         run: chmod +x gradlew
 
-      - name: Compilar e rodar testes unitários
-        run: ./gradlew assembleDebug testDebugUnitTest --stacktrace
+      - name: Compilar, rodar testes unitários e lint
+        run: ./gradlew assembleDebug testDebugUnitTest lintDebug --stacktrace
+
+      - name: Publicar relatório do lint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-lint
+          path: app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
 
       - name: Renomear APK
         run: cp app/build/outputs/apk/debug/app-debug.apk meuspassos.apk
